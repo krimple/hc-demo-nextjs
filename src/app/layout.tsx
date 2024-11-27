@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import {BrowserTelemetry} from "@/app/BrowserTelemetry";
+import Menu from "@/app/_Menu";
+import {ReactNode} from "react";
+import Script from "next/script";
+import ScriptTester from "@/app/ScriptTester";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -22,13 +26,17 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   return (
     <html lang="en">
+
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+
+      <h1 className="py-3 text-5xl font-bold font-sans">Dirt-simple Next.js OTEL Sample</h1>
+        <Menu />
         <BrowserTelemetry />
         {children}
       </body>

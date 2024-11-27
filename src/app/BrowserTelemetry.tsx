@@ -3,8 +3,12 @@
 import {HoneycombWebSDK} from "@honeycombio/opentelemetry-web";
 import {getWebAutoInstrumentations} from "@opentelemetry/auto-instrumentations-web";
 import {useRef} from "react";
+import {ZoneContextManager} from "@opentelemetry/context-zone";
+
+console.log(`trying to render client`)
 
 // we need to only run this on the client
+// otherwise when rendering the top-level
 const componentType = typeof window === 'undefined' ? 'server' : 'client';
 
 const configDefaults = {
@@ -15,13 +19,14 @@ const configDefaults = {
 }
 
 export function BrowserTelemetry() {
+    console.log(`I am rendering in ${typeof window === 'undefined' ? 'server' : 'window'}`)
 
     // hooks must be called without logic
     const apiRef = useRef<HoneycombWebSDK| null>(null);
 
     // only run on server, not on client. Get out if it tries to SSR this.
     if (componentType === 'server') {
-        return null;
+       return null;
     }
 
     const apiKey = process.env.NEXT_PUBLIC_HONEYCOMB_API_KEY;
@@ -31,6 +36,7 @@ export function BrowserTelemetry() {
             // doesn't specify SDK endpoint, defaults to us v1/traces endpoint
             apiRef.current = new HoneycombWebSDK({
                 apiKey: apiKey,
+                contextManager: new ZoneContextManager(),
                 // turn on to get additional tracing info in console log
                 // debug: true, // Set to false for production environment.
                 // endpoint: import.meta.env.VITE_OTEL_EXPORTER_OTLP_ENDPOINT,
@@ -49,6 +55,7 @@ export function BrowserTelemetry() {
                         '@opentelemetry/instrumentation-document-load': configDefaults,
                         '@opentelemetry/instrumentation-user-interaction': {enabled: true}
                     }),
+
                 ],
             });
             apiRef.current.start();

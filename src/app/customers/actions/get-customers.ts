@@ -1,4 +1,4 @@
-'use server';
+"use server";
 
 import { faker } from '@faker-js/faker';
 
@@ -9,7 +9,7 @@ function createRandomCustomer() {
     }
 }
 
-export async function getRandomData() {
+export async function getCustomers() {
     return new Promise((resolve) => {
 
         const fakeCustomers = faker.helpers.multiple(createRandomCustomer, {
@@ -17,7 +17,7 @@ export async function getRandomData() {
         });
 
         setTimeout(() => {
-            resolve(fakeCustomers);
+            resolve({ success: true, customers: fakeCustomers});
         }, 1000 *Math.random());
     });
 }

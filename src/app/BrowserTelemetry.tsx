@@ -2,10 +2,7 @@
 
 import {HoneycombWebSDK} from "@honeycombio/opentelemetry-web";
 import {getWebAutoInstrumentations} from "@opentelemetry/auto-instrumentations-web";
-import {useRef} from "react";
 import {ZoneContextManager} from "@opentelemetry/context-zone";
-
-console.log(`trying to render client`)
 
 // we need to only run this on the client
 // otherwise when rendering the top-level
@@ -19,22 +16,23 @@ const configDefaults = {
 }
 
 export function BrowserTelemetry() {
-    console.log(`I am rendering in ${typeof window === 'undefined' ? 'server' : 'window'}`)
-
-    // hooks must be called without logic
-    const apiRef = useRef<HoneycombWebSDK| null>(null);
+    // uncomment and run npm run build to see the build pre-rendering during compilation!
+    //console.log(`I am rendering in ${typeof window === 'undefined' ? 'server' : 'window'}`)
 
     // only run on server, not on client. Get out if it tries to SSR this.
     if (componentType === 'server') {
+       // get useful stack trace on server log
+       // console.log(new Error('this is a server render, not a client render'));
        return null;
     }
 
     const apiKey = process.env.NEXT_PUBLIC_HONEYCOMB_API_KEY;
 
-    if (apiKey && !apiRef.current) {
+    // if we have an API key we can send to Honeycomb
+    if (apiKey) {
         try {
             // doesn't specify SDK endpoint, defaults to us v1/traces endpoint
-            apiRef.current = new HoneycombWebSDK({
+            const sdk = new HoneycombWebSDK({
                 apiKey: apiKey,
                 contextManager: new ZoneContextManager(),
                 // turn on to get additional tracing info in console log
@@ -55,10 +53,9 @@ export function BrowserTelemetry() {
                         '@opentelemetry/instrumentation-document-load': configDefaults,
                         '@opentelemetry/instrumentation-user-interaction': {enabled: true}
                     }),
-
                 ],
             });
-            apiRef.current.start();
+            sdk.start();
         } catch (e) {
             console.log(`rendering... ${new Date().toISOString()}`);
             console.error(e);

@@ -1,0 +1,39 @@
+services:
+  nextjs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/myapp
+    depends_on:
+      - db
+    command: "npm run dev" # Change based on how your Next.js app starts
+
+  db:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: myapp
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  flyway:
+    image: flyway/flyway:latest
+    depends_on:
+      - db
+    environment:
+      FLYWAY_URL: jdbc:postgresql://db:5432/myapp
+      FLYWAY_USER: postgres
+      FLYWAY_PASSWORD: postgres
+    volumes:
+      - ./migrations:/flyway/sql
+    command: -baselineOnMigrate=true migrate
+
+volumes:
+  postgres_data:

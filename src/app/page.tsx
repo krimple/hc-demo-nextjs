@@ -1,14 +1,8 @@
-import {FC, PropsWithChildren} from 'react';
-
-const Home: FC<PropsWithChildren> = ({children}) => {
+export default function Home() {
   return (
     <div>
-      <h1>Site Header</h1>
-      <section className="w-4/5 mx-auto h-auto">
-        { children }
-      </section>
+      <h1>Demo</h1>
+      <p>Use the menu above to trigger a separate route</p>
     </div>
   );
 }
-
-export default Home;
